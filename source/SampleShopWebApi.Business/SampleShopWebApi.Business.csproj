@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SampleShopWebApi.Data\SampleShopWebApi.Data.csproj" />
+  </ItemGroup>
+</Project>

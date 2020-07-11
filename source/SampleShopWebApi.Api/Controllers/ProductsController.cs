@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using SampleShopWebApi.Business.Interfaces;
 using SampleShopWebApi.DTO.Products;
 
 namespace SampleShopWebApi.Api.Controllers
@@ -11,6 +12,13 @@ namespace SampleShopWebApi.Api.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
+        private readonly IProductManager productManager;
+
+        public ProductsController(IProductManager productManager)
+        {
+            this.productManager = productManager;
+        }
+
         [HttpGet(Name = nameof(GetAllProducts))]
         public ActionResult GetAllProducts()
         {
@@ -52,11 +60,11 @@ namespace SampleShopWebApi.Api.Controllers
         public ActionResult GetProduct(int id)
         {
             return Ok(new Product()
-                {
-                    Id = id,
-                    Name = id.ToString(),
-                    Description = id.ToString()
-                });
+            {
+                Id = id,
+                Name = id.ToString(),
+                Description = id.ToString()
+            });
         }
 
         [HttpPatch("{id:int}", Name = nameof(PartialUpdateProduct))]

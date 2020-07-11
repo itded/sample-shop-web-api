@@ -8,4 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SampleShopWebApi.Business\SampleShopWebApi.Business.csproj" />
+  </ItemGroup>
 </Project>
