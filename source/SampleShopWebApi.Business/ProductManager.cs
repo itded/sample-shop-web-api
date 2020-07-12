@@ -31,10 +31,27 @@ namespace SampleShopWebApi.Business
             return this.productRepository.GetProducts(pageParameters);
         }
 
-        public Product UpdateProduct(int productId, ProductUpdateParameters productUpdateParameters)
+        public UpdateResult<Product> UpdateProduct(int productId, ProductUpdateParameters productUpdateParameters)
         {
-            this.productRepository.UpdateProduct(productId, productUpdateParameters);
-            return this.productRepository.GetProduct(productId);
+            try
+            {
+                this.productRepository.UpdateProduct(productId, productUpdateParameters);
+                Product product = this.productRepository.GetProduct(productId);
+
+                return new UpdateResult<Product>()
+                {
+                    Result = product,
+                    Success = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new UpdateResult<Product>()
+                {
+                    ExceptionMessage = ex.Message,
+                    Success = false
+                };
+            }
         }
     }
 }

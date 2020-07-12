@@ -1,9 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SampleShopWebApi.Api.Settings;
+using SampleShopWebApi.Business;
+using SampleShopWebApi.Business.Interfaces;
+using SampleShopWebApi.Data;
+using SampleShopWebApi.Data.Repositories;
+using SampleShopWebApi.Data.Repositories.Interfaces;
 
 namespace SampleShopWebApi.Api
 {
@@ -21,6 +28,14 @@ namespace SampleShopWebApi.Api
         {
             services.AddControllers();
 
+            string connString = Configuration.GetConnectionString("SampleShop");
+            services.AddDbContext<ShopDbContext>(options => {
+                options.UseSqlServer(connString);
+            });
+
+            services.AddScoped<IProductManager, ProductManager>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+
             // Add API Versioning to as service to your project 
             services.AddApiVersioning(config =>
             {
@@ -31,6 +46,8 @@ namespace SampleShopWebApi.Api
                 // Advertise the API versions supported for the particular endpoint
                 config.ReportApiVersions = true;
             });
+
+            services.Configure<ApiControllerSettings>(Configuration.GetSection("ApiControllerSettings"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj" />
+    <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj"/>
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5"/>
+  </ItemGroup>
 </Project>

@@ -1,7 +1,9 @@
-using System;
-using System.Collections.Generic;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using SampleShopWebApi.Api.Settings;
 using SampleShopWebApi.Business.Interfaces;
+using SampleShopWebApi.DTO.Common;
 using SampleShopWebApi.DTO.Products;
 
 namespace SampleShopWebApi.Api.Controllers
@@ -13,44 +15,63 @@ namespace SampleShopWebApi.Api.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductManager productManager;
+        private readonly int defaultPageSize;
 
-        public ProductsController(IProductManager productManager)
+        public ProductsController(IOptions<ApiControllerSettings> settings, IProductManager productManager)
         {
             this.productManager = productManager;
+            this.defaultPageSize = settings.Value.DefaultPageSize;
         }
 
         [HttpGet(Name = nameof(GetAllProducts))]
         public ActionResult GetAllProducts()
         {
-            var result = new List<Product>();
-            for (int i = 10; i < 20; i++)
+            var result = this.productManager.GetAllProducts();
+
+            int page = 1;
+            int pageSize = result.Count;
+            var paginationMetadata = new PaginationMetadata()
             {
-                result.Add(
-                new Product()
-                {
-                    Id = i,
-                    Name = i.ToString(),
-                    Description = i.ToString()
-                });
-            }
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = pageSize,
+                TotalPages = page,
+                PrevPageLink = string.Empty,
+                NextPageLink = string.Empty
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(result);
         }
 
         [HttpGet(Name = nameof(GetAllProductsV2)), MapToApiVersion("2.0")]
-        public ActionResult GetAllProductsV2()
+        public ActionResult GetAllProductsV2(int? page, int? pageSize)
         {
-            var result = new List<Product>();
-            for (int i = 20; i < 25; i++)
+            // default values
+            page ??= 1;
+            pageSize ??= defaultPageSize;
+
+            var pageParameters = new PageParameters()
             {
-                result.Add(
-                    new Product()
-                    {
-                        Id = i,
-                        Name = i.ToString(),
-                        Description = i.ToString()
-                    });
-            }
+                Page = page.Value,
+                PageSize = pageSize.Value
+            };
+
+            var result = this.productManager.GetProducts(pageParameters);
+
+            // TODO: implement PaginationMetadata
+            var paginationMetadata = new PaginationMetadata()
+            {
+                CurrentPage = page.Value,
+                PageSize = pageSize.Value,
+                TotalCount = 0,
+                TotalPages = 0,
+                PrevPageLink = string.Empty,
+                NextPageLink = string.Empty
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(result);
         }
@@ -59,23 +80,30 @@ namespace SampleShopWebApi.Api.Controllers
         [Route("{id:int}", Name = nameof(GetProduct))]
         public ActionResult GetProduct(int id)
         {
-            return Ok(new Product()
+            var product = this.productManager.GetProduct(id);
+            if (product == null)
             {
-                Id = id,
-                Name = id.ToString(),
-                Description = id.ToString()
-            });
+                return NotFound();
+            }
+
+            return Ok(product);
         }
 
         [HttpPatch("{id:int}", Name = nameof(PartialUpdateProduct))]
         public ActionResult PartialUpdateProduct(int id, [FromBody] ProductPatchRequest patchRequest)
         {
-            return Ok(new Product()
+            var updateProductResult = this.productManager.UpdateProduct(id, new ProductUpdateParameters()
             {
-                Id = id,
-                Name = id.ToString(),
-                Description = patchRequest.Description
+                Description = patchRequest.Description,
+                ReplaceDescription = true
             });
+
+            if (!updateProductResult.Success)
+            {
+                return BadRequest(updateProductResult.ExceptionMessage);
+            }
+
+            return Ok(updateProductResult.Result);
         }
     }
 }

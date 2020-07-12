@@ -13,6 +13,6 @@ namespace SampleShopWebApi.Business.Interfaces
 
         IList<Product> GetProducts(PageParameters pageParameters);
 
-        Product UpdateProduct(int productId, ProductUpdateParameters productUpdateParameters);
+        UpdateResult<Product> UpdateProduct(int productId, ProductUpdateParameters productUpdateParameters);
     }
 }
