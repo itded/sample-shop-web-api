@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -11,19 +12,29 @@ namespace SampleShopWebApi.Api.Controllers
     [ApiController]
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductManager productManager;
         private readonly int defaultPageSize;
 
+        /// <summary>
+        /// .Ctor
+        /// </summary>
+        /// <param name="settings">Constroller settings.</param>
+        /// <param name="productManager">Product manager.</param>
         public ProductsController(IOptions<ApiControllerSettings> settings, IProductManager productManager)
         {
             this.productManager = productManager;
             this.defaultPageSize = settings.Value.DefaultPageSize;
         }
 
-        [HttpGet(Name = nameof(GetAllProducts))]
+        /// <summary>
+        /// Gets all products.
+        /// </summary>
+        /// <returns>List of products and X-Pagination header.</returns>
+        [HttpGet(Name = nameof(GetAllProducts)), MapToApiVersion("1.0")]
+        [ProducesResponseType(typeof(Product[]), (int)HttpStatusCode.OK)]
         public ActionResult GetAllProducts()
         {
             var result = this.productManager.GetAllProducts();
@@ -45,7 +56,14 @@ namespace SampleShopWebApi.Api.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets all products using a page filter.
+        /// </summary>
+        /// <param name="page">The current page.</param>
+        /// <param name="pageSize">Size of the page.</param>
+        /// <returns>List of products and X-Pagination header.</returns>
         [HttpGet(Name = nameof(GetAllProductsV2)), MapToApiVersion("2.0")]
+        [ProducesResponseType(typeof(Product[]), (int)HttpStatusCode.OK)]
         public ActionResult GetAllProductsV2(int? page, int? pageSize)
         {
             // default values
@@ -78,6 +96,8 @@ namespace SampleShopWebApi.Api.Controllers
 
         [HttpGet]
         [Route("{id:int}", Name = nameof(GetProduct))]
+        [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public ActionResult GetProduct(int id)
         {
             var product = this.productManager.GetProduct(id);
@@ -89,7 +109,10 @@ namespace SampleShopWebApi.Api.Controllers
             return Ok(product);
         }
 
-        [HttpPatch("{id:int}", Name = nameof(PartialUpdateProduct))]
+        [HttpPatch]
+        [Route("{id:int}", Name = nameof(GetProduct))]
+        [ProducesResponseType(typeof(UpdateResult<Product>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UpdateResult<Product>), (int)HttpStatusCode.BadRequest)]
         public ActionResult PartialUpdateProduct(int id, [FromBody] ProductPatchRequest patchRequest)
         {
             var updateProductResult = this.productManager.UpdateProduct(id, new ProductUpdateParameters()
