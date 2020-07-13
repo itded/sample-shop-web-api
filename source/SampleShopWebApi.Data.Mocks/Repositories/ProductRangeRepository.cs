@@ -29,7 +29,7 @@ namespace SampleShopWebApi.Data.Mocks.Repositories
             this.indexTo = indexTo;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public Product GetProduct(int productId){
             return this.GetProducts().FirstOrDefault(x => x.Id == productId);
         }

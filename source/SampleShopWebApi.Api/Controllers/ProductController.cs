@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -35,10 +36,11 @@ namespace SampleShopWebApi.Api.Controllers
 
         /// <summary>
         /// Gets all products.
+        /// An X-Pagination header stores a serialized <see cref="PaginationMetadata"/> object.
         /// </summary>
-        /// <returns>List of products and X-Pagination header.</returns>
+        /// <returns>List of products and the X-Pagination header.</returns>
         [HttpGet(Name = nameof(GetAllProducts)), MapToApiVersion("1.0")]
-        [ProducesResponseType(typeof(Product[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IList<Product>), (int)HttpStatusCode.OK)]
         public ActionResult GetAllProducts()
         {
             var result = this.productManager.GetAllProducts();
@@ -55,21 +57,21 @@ namespace SampleShopWebApi.Api.Controllers
                 NextPageLink = string.Empty
             };
 
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            Response?.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(result);
         }
 
         /// <summary>
         /// Gets all products using a page filter.
-        /// X-Pagination header stores serialized a <see cref="PaginationMetadata"/> object.
+        /// An X-Pagination header stores a serialized <see cref="PaginationMetadata"/> object.
         /// </summary>
-        /// <param name="page">The current page.</param>
-        /// <param name="pageSize">Size of the page.</param>
-        /// <returns>List of products and X-Pagination header.</returns>
+        /// <param name="page">A page index.</param>
+        /// <param name="pageSize">A size of the page.</param>
+        /// <returns>List of products and the X-Pagination header.</returns>
         [HttpGet(Name = nameof(GetAllProductsV2)), MapToApiVersion("2.0")]
-        [ProducesResponseType(typeof(Product[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(IList<Product>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public ActionResult GetAllProductsV2(int? page, int? pageSize)
         {
             if (page <= 0 || pageSize <= 0)
@@ -100,7 +102,7 @@ namespace SampleShopWebApi.Api.Controllers
                 NextPageLink = string.Empty
             };
 
-            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            Response?.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(result);
         }
@@ -133,10 +135,15 @@ namespace SampleShopWebApi.Api.Controllers
         /// <returns>Update result.</returns>
         [HttpPatch]
         [Route("{id:int}", Name = nameof(GetProduct))]
-        [ProducesResponseType(typeof(UpdateResult<Product>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(UpdateResult<Product>), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
         public ActionResult PartialUpdateProduct(int id, [FromBody] ProductPatchRequest patchRequest)
         {
+            if (patchRequest == null)
+            {
+                return BadRequest("Product patch request cannot be null");
+            }
+
             var updateProductResult = this.productManager.UpdateProduct(id, new ProductUpdateParameters()
             {
                 Description = patchRequest.Description,
