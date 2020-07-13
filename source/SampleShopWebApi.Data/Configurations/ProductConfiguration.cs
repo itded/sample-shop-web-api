@@ -2,19 +2,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SampleShopWebApi.Data.Entities;
 
-public class ProductConfiguration : IEntityTypeConfiguration<Product>
+namespace SampleShopWebApi.Data.Configurations
 {
-    public void Configure(EntityTypeBuilder<Product> builder)
+    public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
-        builder.ToTable("Products");
-        builder.HasKey(p => p.Id);
-        builder.Property(t => t.ImgUri)
+        public void Configure(EntityTypeBuilder<Product> builder)
+        {
+            builder.ToTable("Products");
+            builder.HasKey(p => p.Id);
+            builder.Property(t => t.ImgUri)
                 .IsRequired();
-        builder.Property(t => t.Name)
+            builder.Property(t => t.Name)
                 .IsRequired();
-        builder.Property(t => t.Price)
+            builder.Property(t => t.Price)
                 .IsRequired();
-        builder.Property(t => t.Description)
+            builder.Property(t => t.Description)
                 .IsRequired(false);
+        }
     }
 }

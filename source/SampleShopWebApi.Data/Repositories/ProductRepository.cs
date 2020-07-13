@@ -2,23 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using SampleShopWebApi.Data.Repositories.Interfaces;
+using SampleShopWebApi.Business.Interfaces;
 using SampleShopWebApi.DTO.Common;
 using SampleShopWebApi.DTO.Products;
 
 namespace SampleShopWebApi.Data.Repositories
 {
+    /// <summary>
+    /// Represents the implementation the <see cref="IProductRepository"/>.
+    /// Data are stored in a database.
+    /// </summary>
     public class ProductRepository: BaseRepository, IProductRepository
     {
+        /// <summary>
+        /// .Ctor
+        /// </summary>
+        /// <param name="shopDbContext">Shop Database Context.</param>
         public ProductRepository(ShopDbContext shopDbContext) : base(shopDbContext) {
             // nothing
         }
 
+        /// <inheritdoc />
         public Product GetProduct(int productId){
             var product = this.ShopDbContext.Products.Find(productId);
             return MapEntityToDto(product);
         }
 
+        /// <inheritdoc />
         public IList<Product> GetProducts(PageParameters pageParameters) {
             if (pageParameters == null)
             {
@@ -34,6 +44,7 @@ namespace SampleShopWebApi.Data.Repositories
             }
         }
 
+        /// <inheritdoc />
         public void UpdateProduct(int productId, ProductUpdateParameters productUpdateParameters) {
             var product = this.ShopDbContext.Products.Find(productId);
 

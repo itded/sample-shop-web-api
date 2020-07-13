@@ -4,6 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SampleShopWebApi.Business\SampleShopWebApi.Business.csproj" />
+    <ProjectReference Include="..\SampleShopWebApi.Data\SampleShopWebApi.Data.csproj" />
     <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj" />
   </ItemGroup>
+
 </Project>

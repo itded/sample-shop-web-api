@@ -15,7 +15,6 @@ using SampleShopWebApi.Business;
 using SampleShopWebApi.Business.Interfaces;
 using SampleShopWebApi.Data;
 using SampleShopWebApi.Data.Repositories;
-using SampleShopWebApi.Data.Repositories.Interfaces;
 
 namespace SampleShopWebApi.Api
 {

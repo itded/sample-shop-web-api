@@ -3,19 +3,17 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.1.1"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5"/>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.5.1"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.5.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj"/>
+    <ProjectReference Include="..\SampleShopWebApi.Data\SampleShopWebApi.Data.csproj" />
+    <ProjectReference Include="..\SampleShopWebApi.DTO\SampleShopWebApi.DTO.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SampleShopWebApi.Business\SampleShopWebApi.Business.csproj"/>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SampleShopWebApi.Data\SampleShopWebApi.Data.csproj"/>
+    <ProjectReference Include="..\SampleShopWebApi.Business\SampleShopWebApi.Business.csproj" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp3.1\SampleShopWebApi.xml</DocumentationFile>

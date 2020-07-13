@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SampleShopWebApi.Data.Configurations;
 using SampleShopWebApi.Data.Entities;
 
 namespace SampleShopWebApi.Data
