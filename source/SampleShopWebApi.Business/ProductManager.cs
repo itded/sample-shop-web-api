@@ -29,15 +29,38 @@ namespace SampleShopWebApi.Business
         }
 
         /// <inheritdoc />
-        public IList<Product> GetAllProducts()
+        public PageResult<IList<Product>> GetAllProducts()
         {
-            return this.productRepository.GetProducts(null);
+            var products = this.productRepository.GetProducts(null);
+            return new PageResult<IList<Product>>()
+            {
+                Result = products,
+                TotalCount = products.Count
+            };
         }
 
         /// <inheritdoc />
-        public IList<Product> GetProducts(PageParameters pageParameters)
+        public PageResult<IList<Product>> GetProducts(PageParameters pageParameters)
         {
-            return this.productRepository.GetProducts(pageParameters);
+            int count = productRepository.GetProductCount();
+
+            // if no result or page is out of range
+            if (count == 0 || 
+                count <= (pageParameters.Page - 1) * pageParameters.PageSize)
+            {
+                return new PageResult<IList<Product>>()
+                {
+                    Result = new List<Product>(),
+                    TotalCount = count
+                };
+            }
+
+            var products = this.productRepository.GetProducts(pageParameters);
+            return new PageResult<IList<Product>>()
+            {
+                Result = products,
+                TotalCount = count
+            };
         }
 
         /// <inheritdoc />

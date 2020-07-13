@@ -43,23 +43,15 @@ namespace SampleShopWebApi.Api.Controllers
         [ProducesResponseType(typeof(IList<Product>), (int)HttpStatusCode.OK)]
         public ActionResult GetAllProducts()
         {
-            var result = this.productManager.GetAllProducts();
+            var productPageResult = this.productManager.GetAllProducts();
+            var products = productPageResult.Result;
 
             int page = 1;
-            int pageSize = result.Count;
-            var paginationMetadata = new PaginationMetadata()
-            {
-                CurrentPage = page,
-                PageSize = pageSize,
-                TotalCount = pageSize,
-                TotalPages = page,
-                PrevPageLink = string.Empty,
-                NextPageLink = string.Empty
-            };
+            int pageSize = productPageResult.TotalCount;
 
-            Response?.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
+            AddPaginationHeaderToResponse(productPageResult, nameof(GetAllProducts), page, pageSize);
 
-            return Ok(result);
+            return Ok(products);
         }
 
         /// <summary>
@@ -89,22 +81,12 @@ namespace SampleShopWebApi.Api.Controllers
                 PageSize = pageSize.Value
             };
 
-            var result = this.productManager.GetProducts(pageParameters);
+            var productPageResult = productManager.GetProducts(pageParameters);
+            var products = productPageResult.Result;
 
-            // TODO: implement PaginationMetadata
-            var paginationMetadata = new PaginationMetadata()
-            {
-                CurrentPage = page.Value,
-                PageSize = pageSize.Value,
-                TotalCount = 0,
-                TotalPages = 0,
-                PrevPageLink = string.Empty,
-                NextPageLink = string.Empty
-            };
+            AddPaginationHeaderToResponse(productPageResult, nameof(GetAllProductsV2), page.Value, pageSize.Value);
 
-            Response?.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
-
-            return Ok(result);
+            return Ok(products);
         }
 
         /// <summary>
@@ -118,7 +100,7 @@ namespace SampleShopWebApi.Api.Controllers
         [ProducesResponseType(typeof(void), (int)HttpStatusCode.NotFound)]
         public ActionResult GetProduct(int id)
         {
-            var product = this.productManager.GetProduct(id);
+            var product = productManager.GetProduct(id);
             if (product == null)
             {
                 return NotFound();
@@ -144,7 +126,7 @@ namespace SampleShopWebApi.Api.Controllers
                 return BadRequest("Product patch request cannot be null");
             }
 
-            var updateProductResult = this.productManager.UpdateProduct(id, new ProductUpdateParameters()
+            var updateProductResult = productManager.UpdateProduct(id, new ProductUpdateParameters()
             {
                 Description = patchRequest.Description,
                 ReplaceDescription = true
@@ -156,6 +138,47 @@ namespace SampleShopWebApi.Api.Controllers
             }
 
             return Ok(updateProductResult.Result);
+        }
+
+        private void AddPaginationHeaderToResponse<T>(PageResult<T> pageResult, string routeName, int page, int pageSize) where T : class
+        {
+            if (Response == null)
+            {
+                return;
+            }
+
+            int totalPages = pageResult.TotalCount % pageSize == 0
+                ? pageResult.TotalCount / pageSize
+                : pageResult.TotalCount / pageSize + 1;
+
+            var prevLink = page > 1 ? Url.Link(routeName,
+                new
+                {
+                    page = page - 1,
+                    pageSize = pageSize
+                }) : "";
+
+            var nextLink = page < totalPages ? Url.Link(routeName,
+                new
+                {
+                    page = page + 1,
+                    pageSize = pageSize
+                }) : "";
+
+            var paginationMetadata = new PaginationMetadata()
+            {
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = pageResult.TotalCount,
+                TotalPages = totalPages,
+                PrevPageLink = prevLink,
+                NextPageLink = nextLink
+            };
+
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+
+            Response?.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata, jsonSerializerOptions));
         }
     }
 }

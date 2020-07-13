@@ -25,6 +25,11 @@ namespace SampleShopWebApi.Data.Mocks.Repositories
         /// <param name="indexTo">The last range index.</param>
         public ProductRangeRepository(int indexFrom, int indexTo)
         {
+            if (indexTo < indexFrom)
+            {
+                throw new ArgumentException($"Value of {nameof(indexFrom)} should less or equal to value of {nameof(indexTo)}.");
+            }
+
             this.indexFrom = indexFrom;
             this.indexTo = indexTo;
         }
@@ -32,6 +37,12 @@ namespace SampleShopWebApi.Data.Mocks.Repositories
         /// <inheritdoc />
         public Product GetProduct(int productId){
             return this.GetProducts().FirstOrDefault(x => x.Id == productId);
+        }
+
+        /// <inheritdoc />
+        public int GetProductCount()
+        {
+            return indexTo - indexFrom + 1;
         }
 
         /// <inheritdoc />

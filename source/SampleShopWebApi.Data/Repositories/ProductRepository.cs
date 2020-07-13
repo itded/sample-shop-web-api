@@ -27,6 +27,12 @@ namespace SampleShopWebApi.Data.Repositories
             var product = this.ShopDbContext.Products.Find(productId);
             return MapEntityToDto(product);
         }
+        
+        /// <inheritdoc />
+        public int GetProductCount()
+        {
+            return this.ShopDbContext.Products.Count();
+        }
 
         /// <inheritdoc />
         public IList<Product> GetProducts(PageParameters pageParameters) {

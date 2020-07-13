@@ -17,6 +17,12 @@ namespace SampleShopWebApi.Business.Interfaces
         Product GetProduct(int productId);
 
         /// <summary>
+        /// Returns a total product count.
+        /// </summary>
+        /// <returns>Total count.</returns>
+        int GetProductCount();
+
+        /// <summary>
         /// Returns a collection of products filtered by given page parameters.
         /// </summary>
         /// <param name="pageParameters">Page parameters.</param>

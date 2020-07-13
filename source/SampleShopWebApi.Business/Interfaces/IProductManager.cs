@@ -20,14 +20,14 @@ namespace SampleShopWebApi.Business.Interfaces
         /// Returns a collection of all found products.
         /// </summary>
         /// <returns>The collection of products.</returns>
-        IList<Product> GetAllProducts();
+        PageResult<IList<Product>> GetAllProducts();
 
         /// <summary>
         /// Returns a collection of products filtered by given page parameters.
         /// </summary>
         /// <param name="pageParameters">Page parameters.</param>
         /// <returns>The collection of products.</returns>
-        IList<Product> GetProducts(PageParameters pageParameters);
+        PageResult<IList<Product>> GetProducts(PageParameters pageParameters);
 
         /// <summary>
         /// Update a product using product update parameters.
