@@ -15,6 +15,7 @@ namespace SampleShopWebApi.Data.Configurations
             builder.Property(t => t.Name)
                 .IsRequired();
             builder.Property(t => t.Price)
+                .HasColumnType("decimal(18, 4)")
                 .IsRequired();
             builder.Property(t => t.Description)
                 .IsRequired(false);

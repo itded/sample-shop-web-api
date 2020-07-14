@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SampleShopWebApi.Business.Interfaces;
 using SampleShopWebApi.DTO.Common;
 using SampleShopWebApi.DTO.Products;
@@ -14,12 +15,16 @@ namespace SampleShopWebApi.Data.Repositories
     /// </summary>
     public class ProductRepository: BaseRepository, IProductRepository
     {
+        private readonly ILogger<ProductRepository> logger;
+
         /// <summary>
         /// .Ctor
         /// </summary>
         /// <param name="shopDbContext">Shop Database Context.</param>
-        public ProductRepository(ShopDbContext shopDbContext) : base(shopDbContext) {
-            // nothing
+        /// <param name="logger">Logger.</param>
+        public ProductRepository(ShopDbContext shopDbContext, ILogger<ProductRepository> logger) : base(shopDbContext, logger)
+        {
+            this.logger = logger;
         }
 
         /// <inheritdoc />
@@ -52,19 +57,19 @@ namespace SampleShopWebApi.Data.Repositories
 
         /// <inheritdoc />
         public void UpdateProduct(int productId, ProductUpdateParameters productUpdateParameters) {
-            var product = this.ShopDbContext.Products.Find(productId);
-
-            if (product == null){
-                throw new ArgumentNullException(nameof(product));
-            }
-
             if (!productUpdateParameters.ReplaceDescription){
                 return;
             }
             
+            var product = this.ShopDbContext.Products.Find(productId);
+            if (product == null){
+                throw new ArgumentNullException(nameof(product));
+            }
+
             product.Description = productUpdateParameters.Description;
             
             this.SaveChanges();
+            this.logger.LogInformation($"Updated product with Id = {productId}.");
         }
 
         private static Product MapEntityToDto(Entities.Product product) => (product != null) ? new Product()

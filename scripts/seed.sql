@@ -1,11 +1,19 @@
 /* creates a Product sample table and fills it using some adapted product data taken from NopCommerce */
 
+if (exists (select  * 
+            from    INFORMATION_SCHEMA.TABLES 
+            where   TABLE_SCHEMA = 'dbo' 
+            and     TABLE_NAME = 'Products'))
+begin
+    return
+end
+
 create table [dbo].[Products] (
     [Id]            int primary key,
     [Name]          nvarchar(512) not null,
     [ImgUri]        nvarchar(512) not null,
     [Price]         decimal(18, 4) not null,
-    [Description]   nvarchar(MAX)
+    [Description]   nvarchar(1024)
 )
 
 insert into [Products] ([Id], [Name], [ImgUri], [Price], [Description])

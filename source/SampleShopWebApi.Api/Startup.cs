@@ -14,6 +14,7 @@ using SampleShopWebApi.Api.Settings;
 using SampleShopWebApi.Business;
 using SampleShopWebApi.Business.Interfaces;
 using SampleShopWebApi.Data;
+using SampleShopWebApi.Data.Providers;
 using SampleShopWebApi.Data.Repositories;
 
 namespace SampleShopWebApi.Api
@@ -44,6 +45,8 @@ namespace SampleShopWebApi.Api
             services.AddDbContext<ShopDbContext>(options => {
                 options.UseSqlServer(connString);
             });
+
+            services.AddSingleton<SqlDataProvider>();
 
             // DI
             services.AddScoped<IProductManager, ProductManager>();

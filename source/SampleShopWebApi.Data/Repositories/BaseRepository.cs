@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace SampleShopWebApi.Data.Repositories
 {
@@ -8,14 +9,17 @@ namespace SampleShopWebApi.Data.Repositories
     public abstract class BaseRepository
     {
         protected readonly ShopDbContext ShopDbContext;
+        private readonly ILogger<BaseRepository> logger;
 
         /// <summary>
         /// .Ctor
         /// </summary>
         /// <param name="shopDbContext">Database context.</param>
-        protected BaseRepository(ShopDbContext shopDbContext)
+        /// <param name="logger">Logger.</param>
+        protected BaseRepository(ShopDbContext shopDbContext, ILogger<BaseRepository> logger)
         {
             this.ShopDbContext = shopDbContext;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -29,7 +33,9 @@ namespace SampleShopWebApi.Data.Repositories
             }
             catch (DbUpdateException ex)
             {
-                // TODO: log and rollback
+                this.logger.LogError(ex.Message);
+
+                // TODO: rollback
                 throw;
             }
         }

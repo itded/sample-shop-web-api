@@ -16,6 +16,8 @@ namespace SampleShopWebApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
